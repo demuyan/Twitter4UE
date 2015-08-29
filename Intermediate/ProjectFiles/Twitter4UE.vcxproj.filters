@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<None Include="..\..\Twitter4UE.uproject" />
+		<Filter Include="Source">
+			<UniqueIdentifier>{4FBCFA58-AC35-4499-8B1A-352338CF7FE8}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Source\Twitter4UE.Target.cs">
+			<Filter>Source</Filter>
+		</None >
+		<None Include="..\..\Source\Twitter4UEEditor.Target.cs">
+			<Filter>Source</Filter>
+		</None >
+		<Filter Include="Config">
+			<UniqueIdentifier>{2CB4547D-B9D1-4706-9136-421E4EFB5B7D}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Config\DefaultEditor.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultEngine.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultGame.ini">
+			<Filter>Config</Filter>
+		</None >
+		<Filter Include="Plugins">
+			<UniqueIdentifier>{28B53998-1F34-4F93-AB20-D3F77B2F22F2}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Plugins\Twitter4UE">
+			<UniqueIdentifier>{AB624321-8F33-498C-A90A-728FBAABB002}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Plugins\Twitter4UE\Source">
+			<UniqueIdentifier>{7F092009-9EDA-4E1A-87D4-329FFAE7681A}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin">
+			<UniqueIdentifier>{DB16FE47-E677-48F7-9188-D98BA6299A8A}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\TwitterPlugin.Build.cs">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin</Filter>
+		</None >
+		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Classes">
+			<UniqueIdentifier>{54CB325E-8A77-479B-8378-EBDDCE44450A}</UniqueIdentifier>
+		</Filter>
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Classes\TwitterAPI.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Classes</Filter>
+		</ClInclude >
+		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Private">
+			<UniqueIdentifier>{7DB9B47A-AC39-4E2F-878B-CE9884F0E1EA}</UniqueIdentifier>
+		</Filter>
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\picojson.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\TwitterAPI.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private</Filter>
+		</ClCompile >
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\TwitterPlugin.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\TwitterPrivatePCH.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private</Filter>
+		</ClInclude >
+		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp">
+			<UniqueIdentifier>{A01FEE3D-C49B-4F0C-A79E-882A3D195AEF}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\base64.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\base64.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\HMAC_SHA1.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\HMAC_SHA1.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\liboauthcpp.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\liboauthcpp.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\SHA1.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\SHA1.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\urlencode.cpp">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\urlencode.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
+		</ClInclude >
+		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Public">
+			<UniqueIdentifier>{39788CB9-DD11-4471-BF69-E8E573D54FFD}</UniqueIdentifier>
+		</Filter>
+		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Public\ITwitterPlugin.h">
+			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Public</Filter>
+		</ClInclude >
+		<None Include="..\..\Plugins\Twitter4UE\TwitterPlugin.uplugin">
+			<Filter>Plugins\Twitter4UE</Filter>
+		</None >
+		<Filter Include="Source\Twitter4UE">
+			<UniqueIdentifier>{25AA542F-CB69-46DE-A4A4-D971EA6F5F34}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Source\Twitter4UE\Twitter4UE.Build.cs">
+			<Filter>Source\Twitter4UE</Filter>
+		</None >
+		<ClCompile Include="..\..\Source\Twitter4UE\Twitter4UE.cpp">
+			<Filter>Source\Twitter4UE</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Twitter4UE\Twitter4UE.h">
+			<Filter>Source\Twitter4UE</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Twitter4UE\Twitter4UEGameMode.cpp">
+			<Filter>Source\Twitter4UE</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Twitter4UE\Twitter4UEGameMode.h">
+			<Filter>Source\Twitter4UE</Filter>
+		</ClInclude >
+	</ItemGroup>
+</Project>

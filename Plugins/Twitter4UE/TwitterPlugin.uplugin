@@ -1,0 +1,21 @@
+{
+	"FileVersion" : 3,
+	
+	"FriendlyName" : "Twitter Plugin for UE 4",
+	"Version" : 1,
+	"VersionName" : "0.1.1",
+	"CreatedBy" : "Nari Demura.",
+	"CreatedByURL" : "http://blog.cnu.jp",
+	"EngineVersion" : "4.8.3",
+	"Description" : "Twitter plugin.",
+	"Category" : "Web",
+	"EnabledByDefault" : false,
+	
+	"Modules" :
+	[
+		{
+			"Name" : "TwitterPlugin",
+			"Type" : "Runtime"
+		}
+	]
+}

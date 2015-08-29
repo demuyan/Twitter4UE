@@ -1,0 +1,24 @@
+# Derived data cache is never checked in
+DerivedDataCache/**
+
+# Engine intermediates
+Intermediate/**/Build
+Intermediate/**/obj
+Intermediate/**/*.bin
+
+# Ignore binary files...
+Binaries/**
+Plugins/**/Binaries/**
+Plugins/**/Intermediate/**
+
+# Ignore any saved local files
+Saved/**
+
+# Ignore Mac desktop services store files 
+.DS_Store
+
+*.sdf
+*.opensdf
+*.suo
+
+Doxyfile
