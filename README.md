@@ -19,6 +19,5 @@ git cloneした後、.uprojectファイルを右クリックして「Generate Vi
 
 Apache License, Version 2.0とします。詳細はLicense.txtを参照してください。
 
-本ライブラリでは一部改変したliboauthcpp(https://github.com/sirikata/liboauthcpp)とpicojson(https://github.com/kazuho/picojson)を利用しています。
-
+本ライブラリでは一部改変したliboauthcpp(https://github.com/sirikata/liboauthcpp)を利用しています。
 

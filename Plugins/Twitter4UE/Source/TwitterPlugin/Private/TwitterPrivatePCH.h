@@ -17,6 +17,7 @@
 #include "ITwitterPlugin.h"
 #include "CoreUObject.h"
 #include "Engine.h"
+#include "Json.h"
 #include "TwitterAPI.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(TwitterLoger, Log, All);

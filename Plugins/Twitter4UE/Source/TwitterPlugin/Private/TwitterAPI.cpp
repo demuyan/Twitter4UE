@@ -14,7 +14,6 @@
  */
 
 #include "TwitterPrivatePCH.h"
-#include "picojson.h"
 #include "liboauthcpp/urlencode.h"
 #include "liboauthcpp/liboauthcpp.h"
 
@@ -156,15 +155,22 @@ void UTwitterAPI::OnReady(FHttpRequestPtr Request, FHttpResponsePtr Response, bo
 
 	UE_LOG(TwitterLoger, Log, TEXT("OnReady %s"), *Response->GetContentAsString());
 
-	// post tweet
-	picojson::value v;
-	picojson::parse(v, TCHAR_TO_UTF8(*Response->GetContentAsString()));
-	bool flg = v.contains("created_at");
-	if (!flg){
+	TSharedRef< TJsonReader<> > Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	TSharedPtr<FJsonObject> ObjectPtr;
+	if (FJsonSerializer::Deserialize(Reader, ObjectPtr) == false){
 		// Broadcast the failed event
 		OnFailedPost.Broadcast();
 		return;
 	}
+
+	FJsonObject& Object = *ObjectPtr.Get();
+	FString CreateAt;
+	if (Object.TryGetStringField(TEXT("created_at"), CreateAt) == false){
+		// Broadcast the failed event
+		OnFailedPost.Broadcast();
+		return;
+	}
+
 	// Broadcast the result event
 	OnGetResult.Broadcast();
 }
