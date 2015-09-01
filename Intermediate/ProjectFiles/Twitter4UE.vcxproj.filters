@@ -4,7 +4,7 @@
 	<ItemGroup>
 		<None Include="..\..\Twitter4UE.uproject" />
 		<Filter Include="Source">
-			<UniqueIdentifier>{4FBCFA58-AC35-4499-8B1A-352338CF7FE8}</UniqueIdentifier>
+			<UniqueIdentifier>{22AEB2E6-7913-44F9-A269-165FBAB085FF}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\Twitter4UE.Target.cs">
 			<Filter>Source</Filter>
@@ -13,7 +13,7 @@
 			<Filter>Source</Filter>
 		</None >
 		<Filter Include="Config">
-			<UniqueIdentifier>{2CB4547D-B9D1-4706-9136-421E4EFB5B7D}</UniqueIdentifier>
+			<UniqueIdentifier>{523D9DE4-A002-4801-B260-A4F2C0DF69C4}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Config\DefaultEditor.ini">
 			<Filter>Config</Filter>
@@ -25,28 +25,28 @@
 			<Filter>Config</Filter>
 		</None >
 		<Filter Include="Plugins">
-			<UniqueIdentifier>{28B53998-1F34-4F93-AB20-D3F77B2F22F2}</UniqueIdentifier>
+			<UniqueIdentifier>{D5EE398D-2EDE-489E-A053-4A7D725E114B}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="Plugins\Twitter4UE">
-			<UniqueIdentifier>{AB624321-8F33-498C-A90A-728FBAABB002}</UniqueIdentifier>
+			<UniqueIdentifier>{4EF5B111-4A2A-49D8-94B0-DA36748AC7BC}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="Plugins\Twitter4UE\Source">
-			<UniqueIdentifier>{7F092009-9EDA-4E1A-87D4-329FFAE7681A}</UniqueIdentifier>
+			<UniqueIdentifier>{8AB2A140-309D-400B-8166-0DDAF314DC23}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin">
-			<UniqueIdentifier>{DB16FE47-E677-48F7-9188-D98BA6299A8A}</UniqueIdentifier>
+			<UniqueIdentifier>{E273FF10-9B2F-4217-812F-D8507C88E983}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\TwitterPlugin.Build.cs">
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin</Filter>
 		</None >
 		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Classes">
-			<UniqueIdentifier>{54CB325E-8A77-479B-8378-EBDDCE44450A}</UniqueIdentifier>
+			<UniqueIdentifier>{C1CD0605-905F-4327-88FB-4272092EDC6F}</UniqueIdentifier>
 		</Filter>
 		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Classes\TwitterAPI.h">
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Classes</Filter>
 		</ClInclude >
 		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Private">
-			<UniqueIdentifier>{7DB9B47A-AC39-4E2F-878B-CE9884F0E1EA}</UniqueIdentifier>
+			<UniqueIdentifier>{DF8D51C5-128A-4FC6-8C75-2DBF6DC6E03D}</UniqueIdentifier>
 		</Filter>
 		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\picojson.h">
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private</Filter>
@@ -61,7 +61,7 @@
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private</Filter>
 		</ClInclude >
 		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp">
-			<UniqueIdentifier>{A01FEE3D-C49B-4F0C-A79E-882A3D195AEF}</UniqueIdentifier>
+			<UniqueIdentifier>{5259B41D-BA22-4553-9BC2-D23757DE20FD}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp\base64.cpp">
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
@@ -94,7 +94,7 @@
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Private\liboauthcpp</Filter>
 		</ClInclude >
 		<Filter Include="Plugins\Twitter4UE\Source\TwitterPlugin\Public">
-			<UniqueIdentifier>{39788CB9-DD11-4471-BF69-E8E573D54FFD}</UniqueIdentifier>
+			<UniqueIdentifier>{57AEA251-8F82-4CDB-A33B-90D2ED6A978B}</UniqueIdentifier>
 		</Filter>
 		<ClInclude Include="..\..\Plugins\Twitter4UE\Source\TwitterPlugin\Public\ITwitterPlugin.h">
 			<Filter>Plugins\Twitter4UE\Source\TwitterPlugin\Public</Filter>
@@ -103,7 +103,7 @@
 			<Filter>Plugins\Twitter4UE</Filter>
 		</None >
 		<Filter Include="Source\Twitter4UE">
-			<UniqueIdentifier>{25AA542F-CB69-46DE-A4A4-D971EA6F5F34}</UniqueIdentifier>
+			<UniqueIdentifier>{9946473B-C3DE-4E29-817D-D72977C91C79}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\Twitter4UE\Twitter4UE.Build.cs">
 			<Filter>Source\Twitter4UE</Filter>
