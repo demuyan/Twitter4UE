@@ -478,7 +478,11 @@ std::string Client::getHttpHeaderMultipart(
 	const char* rawBinary,
 	uint32 rawBinaryLength)
 {
-	return Defaults::AUTHHEADER_PREFIX + buildOAuthParameterMultipart(AuthorizationHeaderString, eType, rawUrl, rawBinary, rawBinaryLength);
+	std::string bodyHash;
+
+	getBodyHash(rawBinary, rawBinaryLength, bodyHash);
+	std::string rawData = Defaults::BODYHASH_KEY + "=" + bodyHash;
+	return Defaults::AUTHHEADER_PREFIX + buildOAuthParameterString(AuthorizationHeaderString, eType, rawUrl, rawData, false);
 }
 
 std::string Client::getFormattedHttpHeader(const Http::RequestType eType,
@@ -576,6 +580,7 @@ std::string Client::buildOAuthParameterString(
 	if (string_type == AuthorizationHeaderString) {
 		KeyValuePairs oauthKeyValuePairs;
 		std::vector<std::string> oauth_keys;
+		oauth_keys.push_back(Defaults::BODYHASH_KEY);
 		oauth_keys.push_back(Defaults::CONSUMERKEY_KEY);
 		oauth_keys.push_back(Defaults::NONCE_KEY);
 		oauth_keys.push_back(Defaults::SIGNATURE_KEY);
@@ -600,101 +605,6 @@ std::string Client::buildOAuthParameterString(
 	/* Build authorization header */
 	return rawParams;
 }
-
-
-
-std::string Client::buildOAuthParameterMultipart(
-	ParameterStringType string_type,
-	const Http::RequestType eType,
-	const std::string& rawUrl,
-	const char* rawBinary,
-	const uint32 rawBinaryLength)
-{
-	KeyValuePairs rawKeyValuePairs;
-	std::string rawParams;
-	std::string oauthSignature;
-	std::string paramsSeperator;
-	std::string pureUrl(rawUrl);
-	std::string bodyHash;
-
-//	LOG(LogLevelDebug, "Signing request " << RequestTypeString(eType) << " " << rawUrl << " " << rawData);
-
-	std::string separator;
-	bool do_urlencode;
-	if (string_type == AuthorizationHeaderString) {
-		separator = ",";
-		do_urlencode = false;
-	}
-	else { // QueryStringString
-		separator = "&";
-		do_urlencode = true;
-	}
-
-	/* Clear header string initially */
-	rawKeyValuePairs.clear();
-
-	/* If URL itself contains ?key=value, then extract and put them in map */
-	size_t nPos = rawUrl.find_first_of("?");
-	if (std::string::npos != nPos)
-	{
-		/* Get only URL */
-		pureUrl = rawUrl.substr(0, nPos);
-
-		/* Get only key=value data part */
-		std::string dataPart = rawUrl.substr(nPos + 1);
-		rawKeyValuePairs = ParseKeyValuePairs(dataPart);
-	}
-
-	// NOTE: We always request URL encoding on the first pass so that the
-	// signature generation works properly. This *relies* on
-	// buildOAuthTokenKeyValuePairs overwriting values when we do the second
-	// pass to get the values in the form we actually want. The signature and
-	// rawdata are the only things that change, but the signature is only used
-	// in the second pass and the rawdata is already encoded, regardless of
-	// request type.
-
-	/* Build key-value pairs needed for OAuth request token, without signature */
-	getBodyHash(rawBinary, rawBinaryLength, bodyHash);
-	buildOAuthTokenKeyValuePairs(false, rawUrl, std::string(""), rawKeyValuePairs, true, true, bodyHash);
-
-	/* Get url encoded base64 signature using request type, url and parameters */
-	getSignature(Http::RequestType::Post, pureUrl, rawKeyValuePairs, oauthSignature);
-
-	/* Now, again build key-value pairs with signature this time */
-	buildOAuthTokenKeyValuePairs(false, rawUrl, oauthSignature, rawKeyValuePairs, do_urlencode, false, std::string(""));
-
-	/* Get OAuth header in string format. If we're getting the Authorization
-	* header, we need to filter out other parameters.
-	*/
-	if (string_type == AuthorizationHeaderString) {
-		KeyValuePairs oauthKeyValuePairs;
-		std::vector<std::string> oauth_keys;
-		oauth_keys.push_back(Defaults::BODYHASH_KEY);
-		oauth_keys.push_back(Defaults::CONSUMERKEY_KEY);
-		oauth_keys.push_back(Defaults::NONCE_KEY);
-		oauth_keys.push_back(Defaults::SIGNATURE_KEY);
-		oauth_keys.push_back(Defaults::SIGNATUREMETHOD_KEY);
-		oauth_keys.push_back(Defaults::TIMESTAMP_KEY);
-		oauth_keys.push_back(Defaults::TOKEN_KEY);
-//		oauth_keys.push_back(Defaults::VERIFIER_KEY);
-		oauth_keys.push_back(Defaults::VERSION_KEY);
-
-		for (size_t i = 0; i < oauth_keys.size(); i++) {
-			assert(rawKeyValuePairs.count(oauth_keys[i]) <= 1);
-			KeyValuePairs::iterator oauth_key_it = rawKeyValuePairs.find(oauth_keys[i]);
-			if (oauth_key_it != rawKeyValuePairs.end())
-				ReplaceOrInsertKeyValuePair(oauthKeyValuePairs, oauth_keys[i], oauth_key_it->second);
-		}
-		getStringFromOAuthKeyValuePairs(oauthKeyValuePairs, rawParams, separator);
-	}
-	else if (string_type == QueryStringString) {
-		getStringFromOAuthKeyValuePairs(rawKeyValuePairs, rawParams, separator);
-	}
-
-	/* Build authorization header */
-	return rawParams;
-}
-
 
 
 /*++

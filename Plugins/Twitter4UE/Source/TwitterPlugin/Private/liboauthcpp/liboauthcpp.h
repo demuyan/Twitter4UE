@@ -285,14 +285,6 @@ private:
         const std::string& rawData,
         const bool includeOAuthVerifierPin);
 
-
-	std::string buildOAuthParameterMultipart(
-		ParameterStringType string_type,
-		const Http::RequestType eType,
-		const std::string& rawUrl,
-		const char* rawBinary, 
-		const uint32 rawBinaryLength);
-
     bool getSignature( const Http::RequestType eType, /* in */
                        const std::string& rawUrl, /* in */
                        const KeyValuePairs& rawKeyValuePairs, /* in */

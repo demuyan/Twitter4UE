@@ -244,10 +244,13 @@ void UTwitterAPI::OnReadyAuthWithPin(FHttpRequestPtr Request, FHttpResponsePtr R
 }
 
 
-void UTwitterAPI::InitScreenShot(){
+void UTwitterAPI::AttachScreenShot(){
 	UGameViewportClient::OnScreenshotCaptured().AddUObject(this, &UTwitterAPI::OnScreenshotCapture);
 }
 
+void UTwitterAPI::DetachScreenShot(){
+	UGameViewportClient::OnScreenshotCaptured().RemoveUObject(this, &UTwitterAPI::OnScreenshotCapture);
+}
 
 void UTwitterAPI::OnScreenshotCapture(int32 ImageWidth, int32 ImageHeight, const TArray<FColor>& Bitmap) {
 
