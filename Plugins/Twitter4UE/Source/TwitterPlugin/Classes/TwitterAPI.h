@@ -181,9 +181,13 @@ public:
 	void RequestOAuthTokenWithPin( const FString& PinAuthAccessToken, const FString& PinAuthTokenSecret, const FString& PinNumber);
 
 
+	/** スクリーンショット処理にアタッチする
+	*/
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "AttachScreenshot"), Category = "Twitter")
 	void AttachScreenShot();
 
+	/** スクリーンショット処理にデタッチする
+	*/
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "DetachScreenshot"), Category = "Twitter")
 	void DetachScreenShot();
 
