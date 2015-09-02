@@ -285,61 +285,6 @@ void UTwitterAPI::GetPostDataBody(FString Boundary, uint32 ImageWidth, uint32 Im
 	out.Append((uint8*)TCHAR_TO_ANSI(*PostDataEnd), PostDataEnd.Len());
 }
 
-FString UTwitterAPI::UploadImageDebug()
-{
-	OAuth::Consumer Consumer(TCHAR_TO_UTF8(*ConsumerKey), TCHAR_TO_UTF8(*ConsumerSecret));
-	OAuth::Token Token(TCHAR_TO_UTF8(*AccessToken), TCHAR_TO_UTF8(*TokenSecret));
-	OAuth::Client Oauth(&Consumer, &Token);
-
-	uint8 onepx_png[] = {
-		0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
-		0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-		0x01, 0x03, 0x00, 0x00, 0x00, 0x25, 0xdb, 0x56, 0xca, 0x00, 0x00, 0x00,
-		0x03, 0x50, 0x4c, 0x54, 0x45, 0xff, 0x4d, 0x00, 0x5c, 0x35, 0x38, 0x7f,
-		0x00, 0x00, 0x00, 0x01, 0x74, 0x52, 0x4e, 0x53, 0xcc, 0xd2, 0x34, 0x56,
-		0xfd, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63,
-		0x62, 0x00, 0x00, 0x00, 0x06, 0x00, 0x03, 0x36, 0x37, 0x7c, 0xa8, 0x00,
-		0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82
-	};
-	unsigned int onepx_png_len = 95;
-
-	FString Boundary("0123456789");
-	TArray<uint8> PostDataBinary;
-
-	TArray<uint8> Source;
-	Source.Empty();
-	Source.Append(onepx_png, onepx_png_len);
-
-	GetPostDataBody(Boundary, 1, 1, Source, PostDataBinary);
-
-	// Create the post request with the generated data
-	TSharedRef< IHttpRequest > HttpRequest = FHttpModule::Get().CreateRequest();
-	HttpRequest->SetVerb("POST");
-
-	FString Url = "https://upload.twitter.com/1.1/media/upload.json";
-	HttpRequest->SetURL(Url);
-
-	FString ContentType("multipart/form-data; boundary=");
-	ContentType.Append(Boundary);
-	HttpRequest->SetHeader("Content-Type", ContentType);
-
-	std::string RawUrl(TCHAR_TO_UTF8(*Url));
-	//	std::string RawData(TCHAR_TO_UTF8(*PostData));
-
-	HttpRequest->SetHeader("Authorization", Oauth.getHttpHeaderMultipart(OAuth::Http::Post, RawUrl, (const char*)PostDataBinary.GetData(), PostDataBinary.Num()).c_str());
-	HttpRequest->SetHeader("Content-Length", FString::FromInt(PostDataBinary.Num()));
-
-	HttpRequest->SetContent(PostDataBinary);
-
-	DisplayHeader(HttpRequest->GetAllHeaders());
-
-	FString returnval("");
-
-	return returnval;
-}
-
-
-
 void UTwitterAPI::UploadImage(int32 ImageWidth, int32 ImageHeight, const TArray<uint8>& Image)
 {
 	OAuth::Consumer Consumer(TCHAR_TO_UTF8(*ConsumerKey), TCHAR_TO_UTF8(*ConsumerSecret));

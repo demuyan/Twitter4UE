@@ -130,11 +130,6 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Twitter")
 	FOnFailMultimediaUpload OnFailMultimediaUpload;
 
-//Debug
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "UploadImage DB"), Category = "Twitter")
-	FString UploadImageDebug();
-//Debug,End
-
 	/** @brief PIN認証用URLを取得する 
 	 *  @param accessToken URLに渡すアクセストークン（公開鍵）
 	 *  @retval PIN認証用URL
