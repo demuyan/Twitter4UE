@@ -205,6 +205,15 @@ public:
                          const std::string& rawData = "",
                          const bool includeOAuthVerifierPin = false);
 
+	/** Build an OAuth HTTP header(multipart) for the given request. This version provides
+	*  only the field value.
+	*
+	*  \param eType the HTTP request type, e.g. GET or POST
+	*  \param rawUrl the raw request URL (should include query parameters)
+	*  \param binaryData HTTP body(binary data)
+	*  \param length length of binaryData
+	*  \returns a string containing the HTTP header
+	*/
 
 	std::string getHttpHeaderMultipart(
 		const Http::RequestType eType,
@@ -254,6 +263,7 @@ private:
     std::string m_nonce;
     std::string m_timeStamp;
 
+	/* Get OAuth Body Hash */
 	void getBodyHash(const char* rawBinary, uint32 rawBinaryLength, std::string& bodyHash);
 
     /* OAuth related utility methods */
