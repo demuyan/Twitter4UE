@@ -46,7 +46,7 @@ private:
 
 
 	/**
-	* @brief Tweet関数の処理完了時のコールバック関数
+	* Tweet関数の処理完了時のコールバック関数
 	* @param Request サーバへのリクエスト内容
 	* @param Response サーバからの反応
 	* @param bWasSuccess サーバからの反応
@@ -54,7 +54,7 @@ private:
 	void OnReady(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
 	/** 
-	 * @brief RequestAccessToken関数の処理完了時のコールバック関数
+	 * RequestAccessToken関数の処理完了時のコールバック関数
 	 * @param Request サーバへのリクエスト内容
 	 * @param Response サーバからの反応
 	 * @param bWasSuccess サーバからの反応
@@ -62,7 +62,7 @@ private:
 	void OnReadyToken(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	/**
-	* @brief RequestOAuthTokenWithPin関数の処理完了時のコールバック関数
+	* RequestOAuthTokenWithPin関数の処理完了時のコールバック関数
 	* @param Request サーバへのリクエスト内容
 	* @param Response サーバからの反応
 	* @param bWasSuccess サーバからの反応
@@ -70,7 +70,7 @@ private:
 	void OnReadyAuthWithPin(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	/**
-	* @brief HTTPヘッダ情報と引数を表示する
+	* HTTPヘッダ情報と引数を表示する
 	* @param headers ヘッダサーバへのリクエスト内容
 	* @param Response サーバからの反応
 	*/
@@ -130,7 +130,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Twitter")
 	FOnFailMultimediaUpload OnFailMultimediaUpload;
 
-	/** @brief PIN認証用URLを取得する 
+	/** PIN認証用URLを取得する 
 	 *  @param accessToken URLに渡すアクセストークン（公開鍵）
 	 *  @retval PIN認証用URL
 	 *
@@ -139,7 +139,7 @@ public:
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get AuthURL"), Category = "Twitter")
 	FString GetAuthURL(const FString& PinAuthAccessToken);
 
-	/** @brief TwitterAPIインスタンスを取得する
+	/** TwitterAPIインスタンスを取得する
 	 *  @param AppConsumerKey コンシューマーキー（公開鍵）
 	 *  @param AppConsumerKeySecret コンシューマーキー（秘密鍵）
 	 *  @retval TwitterAPI本体
@@ -149,7 +149,7 @@ public:
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Create Twitter Client"), Category = "Twitter")
 	static UTwitterAPI* Create( const FString& AppConsumerKey, const FString& AppConsumerSecret );
 
-	/** @brief ツイートする
+	/** ツイートする
 	 *  @param tweet 投稿内容（文章）
      *  
 	 *  引数で渡した内容をツイートする
@@ -157,7 +157,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Update Tweet"), Category = "Twitter")
 	void UpdateTweet(const FString& Tweet, const TArray<FString>& MediaIds);
 
-	/** @brief PIN認証用アクセストークンを取得する。
+	/** PIN認証用アクセストークンを取得する。
      *  @param tweet 投稿内容（文章）
 	 *
 	 *  PIN認証の画面を表示したり、投稿用アクセストークンを取得するためのアクセストークンを取得する
@@ -165,7 +165,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Request Access Token"), Category = "Twitter")
 	void RequestAccessToken();
 
-	/** @brief 投稿用アクセストークンを取得する
+	/** 投稿用アクセストークンを取得する
 	*   @param PinAuthAccessToken PIN認証用アクセストークン（公開鍵）
 	*   @param PinAuthTokenSecret PIN認証用アクセストークン（秘密鍵）
 	*   @param PinNumber PIN番号
