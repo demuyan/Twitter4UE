@@ -88,19 +88,15 @@ private:
 
 public:
 
-	/** コンシューマ　キー　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString ConsumerKey;
 
-	/** コンシューマ　シークレット　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString ConsumerSecret;
 
-	/** アクセストークン　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString AccessToken;
 
-	/** トークンシークレット　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString TokenSecret;
 
@@ -130,18 +126,18 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Twitter")
 	FOnFailMultimediaUpload OnFailMultimediaUpload;
 
-	/** PIN認証用URLを取得する 
-	 *  @param accessToken URLに渡すアクセストークン（公開鍵）
-	 *  @retval PIN認証用URL
+	/** PINベース認証のURLを取得する  
+	 *  @param accessToken Access Token
+	 *  @retval URL for PIN-based authorization
 	 *
-	 *  PIN認証をするためのURLを取得する。取得したURLは、標準ブラウザで開くことで認証画面へ遷移する。
+	 *  取得したURLは、標準ブラウザで開くことで認証画面へ遷移する。
 	 */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get AuthURL"), Category = "Twitter")
 	FString GetAuthURL(const FString& PinAuthAccessToken);
 
-	/** TwitterAPIインスタンスを取得する
-	 *  @param AppConsumerKey コンシューマーキー（公開鍵）
-	 *  @param AppConsumerKeySecret コンシューマーキー（秘密鍵）
+	/** TwitterAPIインターフェイスを取得する
+	 *  @param AppConsumerKey Consumer Key
+	 *  @param AppConsumerSecret Consumer Secret
 	 *  @retval TwitterAPI本体
 	 *
 	 *   TwitterAPIインスタンスを取得する。このインスタンスを通して、プラグインとやりとりを行う。
