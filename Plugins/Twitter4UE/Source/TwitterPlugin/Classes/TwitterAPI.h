@@ -16,6 +16,7 @@
 #pragma once
 
 #include "Http.h"
+#include "Engine.h"
 #include "TwitterAPI.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGetResult);
@@ -28,6 +29,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailedOAuth);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailedPost);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompleteMultimediaupload, FString, MediaIdString);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailMultimediaUpload);
+
+
 /**
   * Twitter APIクラス
   */
@@ -38,8 +44,9 @@ class UTwitterAPI : public UObject
 
 private:
 
+
 	/**
-	* @brief Tweet関数の処理完了時のコールバック関数
+	* Tweet関数の処理完了時のコールバック関数
 	* @param Request サーバへのリクエスト内容
 	* @param Response サーバからの反応
 	* @param bWasSuccess サーバからの反応
@@ -47,7 +54,7 @@ private:
 	void OnReady(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
 	/** 
-	 * @brief RequestAccessToken関数の処理完了時のコールバック関数
+	 * RequestAccessToken関数の処理完了時のコールバック関数
 	 * @param Request サーバへのリクエスト内容
 	 * @param Response サーバからの反応
 	 * @param bWasSuccess サーバからの反応
@@ -55,7 +62,7 @@ private:
 	void OnReadyToken(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	/**
-	* @brief RequestOAuthTokenWithPin関数の処理完了時のコールバック関数
+	* RequestOAuthTokenWithPin関数の処理完了時のコールバック関数
 	* @param Request サーバへのリクエスト内容
 	* @param Response サーバからの反応
 	* @param bWasSuccess サーバからの反応
@@ -63,27 +70,33 @@ private:
 	void OnReadyAuthWithPin(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	/**
-	* @brief HTTPヘッダ情報と引数を表示する
+	* HTTPヘッダ情報と引数を表示する
 	* @param headers ヘッダサーバへのリクエスト内容
 	* @param Response サーバからの反応
 	*/
 	void DisplayHeaderAndParams(TArray<FString> headers, const FString& outStr);
+	void DisplayHeader(TArray<FString> Headers);
+
+	void OnScreenshotCapture(int32 ImageWidth, int32 ImageHeight, const TArray<FColor>& Bitmap);
+
+	void UploadImage(int32 ImageWidth, int32 ImageHeight, const TArray<uint8>& Image);
+
+	void OnMultimediaUploadComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	void GetPostDataBody(FString Boundary, uint32 ImageWidth, uint32 ImageHeight, const TArray<uint8>& Image, TArray<uint8>& out);
+
 
 public:
 
-	/** コンシューマ　キー　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString ConsumerKey;
 
-	/** コンシューマ　シークレット　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString ConsumerSecret;
 
-	/** アクセストークン　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString AccessToken;
 
-	/** トークンシークレット　*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Twitter")
 	FString TokenSecret;
 
@@ -107,18 +120,24 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Twitter")
 	FOnFailedOAuth OnFailedOAuth;
 
-	/** @brief PIN認証用URLを取得する 
-	 *  @param accessToken URLに渡すアクセストークン（公開鍵）
-	 *  @retval PIN認証用URL
+	UPROPERTY(BlueprintAssignable, Category = "Twitter")
+	FOnCompleteMultimediaupload OnCompleteMultimediaupload;
+
+	UPROPERTY(BlueprintAssignable, Category = "Twitter")
+	FOnFailMultimediaUpload OnFailMultimediaUpload;
+
+	/** PINベース認証のURLを取得する  
+	 *  @param accessToken Access Token
+	 *  @retval URL for PIN-based authorization
 	 *
-	 *  PIN認証をするためのURLを取得する。取得したURLは、標準ブラウザで開くことで認証画面へ遷移する。
+	 *  取得したURLは、標準ブラウザで開くことで認証画面へ遷移する。
 	 */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get AuthURL"), Category = "Twitter")
 	FString GetAuthURL(const FString& PinAuthAccessToken);
 
-	/** @brief TwitterAPIインスタンスを取得する
-	 *  @param AppConsumerKey コンシューマーキー（公開鍵）
-	 *  @param AppConsumerKeySecret コンシューマーキー（秘密鍵）
+	/** TwitterAPIインターフェイスを取得する
+	 *  @param AppConsumerKey Consumer Key
+	 *  @param AppConsumerSecret Consumer Secret
 	 *  @retval TwitterAPI本体
 	 *
 	 *   TwitterAPIインスタンスを取得する。このインスタンスを通して、プラグインとやりとりを行う。
@@ -126,15 +145,15 @@ public:
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Create Twitter Client"), Category = "Twitter")
 	static UTwitterAPI* Create( const FString& AppConsumerKey, const FString& AppConsumerSecret );
 
-	/** @brief ツイートする
+	/** ツイートする
 	 *  @param tweet 投稿内容（文章）
      *  
 	 *  引数で渡した内容をツイートする
 	 */
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Update Tweet"), Category = "Twitter")
-	void UpdateTweet(const FString& Tweet);
+	void UpdateTweet(const FString& Tweet, const TArray<FString>& MediaIds);
 
-	/** @brief PIN認証用アクセストークンを取得する。
+	/** PIN認証用アクセストークンを取得する。
      *  @param tweet 投稿内容（文章）
 	 *
 	 *  PIN認証の画面を表示したり、投稿用アクセストークンを取得するためのアクセストークンを取得する
@@ -142,7 +161,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Request Access Token"), Category = "Twitter")
 	void RequestAccessToken();
 
-	/** @brief 投稿用アクセストークンを取得する
+	/** 投稿用アクセストークンを取得する
 	*   @param PinAuthAccessToken PIN認証用アクセストークン（公開鍵）
 	*   @param PinAuthTokenSecret PIN認証用アクセストークン（秘密鍵）
 	*   @param PinNumber PIN番号
@@ -151,5 +170,16 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Request OAuth Token With PIN"), Category = "Twitter")
 	void RequestOAuthTokenWithPin( const FString& PinAuthAccessToken, const FString& PinAuthTokenSecret, const FString& PinNumber);
+
+
+	/** スクリーンショット処理にアタッチする
+	*/
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "AttachScreenshot"), Category = "Twitter")
+	void AttachScreenShot();
+
+	/** スクリーンショット処理にデタッチする
+	*/
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "DetachScreenshot"), Category = "Twitter")
+	void DetachScreenShot();
 
 };

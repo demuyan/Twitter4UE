@@ -204,6 +204,23 @@ public:
                          const std::string& rawUrl,
                          const std::string& rawData = "",
                          const bool includeOAuthVerifierPin = false);
+
+	/** Build an OAuth HTTP header(multipart) for the given request. This version provides
+	*  only the field value.
+	*
+	*  \param eType the HTTP request type, e.g. GET or POST
+	*  \param rawUrl the raw request URL (should include query parameters)
+	*  \param binaryData HTTP body(binary data)
+	*  \param length length of binaryData
+	*  \returns a string containing the HTTP header
+	*/
+
+	std::string getHttpHeaderMultipart(
+		const Http::RequestType eType,
+		const std::string& rawUrl,
+		const char* binaryData,
+		uint32 length);
+
     /** Build an OAuth HTTP header for the given request. This version gives a
      *  fully formatted header, i.e. including the header field name.
      *
@@ -246,13 +263,17 @@ private:
     std::string m_nonce;
     std::string m_timeStamp;
 
+	/* Get OAuth Body Hash */
+	void getBodyHash(const char* rawBinary, uint32 rawBinaryLength, std::string& bodyHash);
+
     /* OAuth related utility methods */
     bool buildOAuthTokenKeyValuePairs( const bool includeOAuthVerifierPin, /* in */
                                        const std::string& rawData, /* in */
                                        const std::string& oauthSignature, /* in */
-                                       KeyValuePairs& keyValueMap /* out */,
-                                       const bool urlEncodeValues /* in */,
-                                       const bool generateTimestamp /* in */);
+                                       KeyValuePairs& keyValueMap, /* out */
+                                       const bool urlEncodeValues, /* in */
+                                       const bool generateTimestamp, /* in */
+									   const std::string& oauthBodyHash);
 
     bool getStringFromOAuthKeyValuePairs( const KeyValuePairs& rawParamMap, /* in */
                                           std::string& rawParams, /* out */
@@ -262,7 +283,8 @@ private:
         QueryStringString,
         AuthorizationHeaderString
     } ParameterStringType;
-    // Utility for building OAuth HTTP header or query string. The string type
+
+	// Utility for building OAuth HTTP header or query string. The string type
     // controls the separator and also filters parameters: for query strings,
     // all parameters are included. For HTTP headers, only auth parameters are
     // included.

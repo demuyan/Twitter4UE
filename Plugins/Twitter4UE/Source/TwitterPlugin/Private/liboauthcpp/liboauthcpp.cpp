@@ -4,6 +4,7 @@
 #include "HMAC_SHA1.h"
 #include "base64.h"
 #include "urlencode.h"
+#include "SHA1.h"
 #include <cstdlib>
 #include <vector>
 #include <cassert>
@@ -25,6 +26,7 @@ namespace Defaults
     const std::string TOKEN_KEY = "oauth_token";
     const std::string TOKENSECRET_KEY = "oauth_token_secret";
     const std::string VERIFIER_KEY = "oauth_verifier";
+	const std::string BODYHASH_KEY = "oauth_body_hash";
 
     const std::string AUTHHEADER_FIELD = "Authorization: ";
     const std::string AUTHHEADER_PREFIX = "OAuth ";
@@ -270,12 +272,13 @@ void Client::generateNonceTimeStamp()
 * @remarks: internal method
 *
 *--*/
-bool Client::buildOAuthTokenKeyValuePairs( const bool includeOAuthVerifierPin,
+bool Client::buildOAuthTokenKeyValuePairs(const bool includeOAuthVerifierPin,
                                           const std::string& rawData,
                                           const std::string& oauthSignature,
                                           KeyValuePairs& keyValueMap,
                                           const bool urlEncodeValues,
-                                          const bool generateTimestamp )
+                                          const bool generateTimestamp,
+										  const std::string& oauthBodyHash)
 {
     // Encodes value part of key-value pairs depending on type of output (query
     // string vs. HTTP headers.
@@ -286,6 +289,11 @@ bool Client::buildOAuthTokenKeyValuePairs( const bool includeOAuthVerifierPin,
     {
         generateNonceTimeStamp();
     }
+
+	if (oauthBodyHash.length()){
+		/* Body Hash */
+		ReplaceOrInsertKeyValuePair(keyValueMap, Defaults::BODYHASH_KEY, oauthBodyHash);
+	}
 
     /* Consumer key and its value */
     ReplaceOrInsertKeyValuePair(keyValueMap, Defaults::CONSUMERKEY_KEY, value_encoder(mConsumer->key()));
@@ -306,7 +314,7 @@ bool Client::buildOAuthTokenKeyValuePairs( const bool includeOAuthVerifierPin,
     /* Signature method, only HMAC-SHA1 as of now */
     ReplaceOrInsertKeyValuePair(keyValueMap, Defaults::SIGNATUREMETHOD_KEY, std::string( "HMAC-SHA1" ));
 
-    /* Timestamp */
+	/* Timestamp */
     ReplaceOrInsertKeyValuePair(keyValueMap, Defaults::TIMESTAMP_KEY, value_encoder(m_timeStamp));
 
     /* Token */
@@ -327,20 +335,24 @@ bool Client::buildOAuthTokenKeyValuePairs( const bool includeOAuthVerifierPin,
     /* Data if it's present */
     if( rawData.length() )
     {
-        /* Data should already be urlencoded once */
-        std::string dummyStrKey;
-        std::string dummyStrValue;
-        size_t nPos = rawData.find_first_of( "=" );
-        if( std::string::npos != nPos )
-        {
-            dummyStrKey = rawData.substr( 0, nPos );
-            dummyStrValue = rawData.substr( nPos + 1 );
-			ReplaceOrInsertKeyValuePair(keyValueMap, dummyStrKey, urlencode(dummyStrValue, URLEncode_Everything));
-        }
+		size_t nPos = rawData.find_first_of("=");
+		if (std::string::npos != nPos)
+		{
+			KeyValuePairs RawDataKeyPairs = ParseKeyValuePairs(rawData);
+
+			for (auto KeyValuePair : RawDataKeyPairs){
+
+				auto dummyStrKey = KeyValuePair.first;
+				auto dummyStrValue = KeyValuePair.second;
+				ReplaceOrInsertKeyValuePair(keyValueMap, dummyStrKey, urlencode(dummyStrValue, URLEncode_Everything));
+			}
+		}
+
     }
 
     return ( keyValueMap.size() ) ? true : false;
 }
+
 
 /*++
 * @method: Client::getSignature
@@ -371,7 +383,7 @@ bool Client::getSignature( const Http::RequestType eType,
     /* Build a string using key-value pairs */
     paramsSeperator = "&";
     getStringFromOAuthKeyValuePairs( rawKeyValuePairs, rawParams, paramsSeperator );
-    LOG(LogLevelDebug, "Normalized parameters: " << rawParams);
+//	UE_LOG(TwitterLoger, Log, TEXT("Normalized parameters: %s"), *rawParams);
 
     /* Start constructing base signature string. Refer http://dev.twitter.com/auth#intro */
     switch( eType )
@@ -412,9 +424,10 @@ bool Client::getSignature( const Http::RequestType eType,
         }
         break;
     }
-    sigBase.append( PercentEncode( rawUrl ) );
-    sigBase.append( "&" );
-    sigBase.append( PercentEncode( rawParams ) );
+
+	sigBase.append(PercentEncode(rawUrl));
+	sigBase.append("&");
+    sigBase.append(PercentEncode( rawParams ) );
 
 	FString sigBaseFStr(sigBase.c_str());
 	UE_LOG(TwitterLoger, Log, TEXT("Signature base string: %s"), *sigBaseFStr);
@@ -459,6 +472,19 @@ std::string Client::getHttpHeader(const Http::RequestType eType,
     return Defaults::AUTHHEADER_PREFIX + buildOAuthParameterString(AuthorizationHeaderString, eType, rawUrl, rawData, includeOAuthVerifierPin);
 }
 
+std::string Client::getHttpHeaderMultipart(
+	const Http::RequestType eType,
+	const std::string& rawUrl,
+	const char* rawBinary,
+	uint32 rawBinaryLength)
+{
+	std::string bodyHash;
+
+	getBodyHash(rawBinary, rawBinaryLength, bodyHash);
+	std::string rawData = Defaults::BODYHASH_KEY + "=" + bodyHash;
+	return Defaults::AUTHHEADER_PREFIX + buildOAuthParameterString(AuthorizationHeaderString, eType, rawUrl, rawData, false);
+}
+
 std::string Client::getFormattedHttpHeader(const Http::RequestType eType,
     const std::string& rawUrl,
     const std::string& rawData,
@@ -475,94 +501,111 @@ std::string Client::getURLQueryString(const Http::RequestType eType,
     return buildOAuthParameterString(QueryStringString, eType, rawUrl, rawData, includeOAuthVerifierPin);
 }
 
-std::string Client::buildOAuthParameterString(
-    ParameterStringType string_type,
-    const Http::RequestType eType,
-    const std::string& rawUrl,
-    const std::string& rawData,
-    const bool includeOAuthVerifierPin)
-{
-    KeyValuePairs rawKeyValuePairs;
-    std::string rawParams;
-    std::string oauthSignature;
-    std::string paramsSeperator;
-    std::string pureUrl( rawUrl );
+void Client::getBodyHash(const char* rawBinary, uint32 rawBinaryLength,std::string& bodyHash){
 
-    LOG(LogLevelDebug, "Signing request " << RequestTypeString(eType) << " " << rawUrl << " " << rawData);
+	CSHA1 sha1;
+	UINT_8	SHA1_Key[64];
 
-    std::string separator;
-    bool do_urlencode;
-    if (string_type == AuthorizationHeaderString) {
-        separator = ",";
-        do_urlencode = false;
-    }
-    else { // QueryStringString
-        separator = "&";
-        do_urlencode = true;
-    }
+	memset(SHA1_Key, 0, 64);
 
-    /* Clear header string initially */
-    rawKeyValuePairs.clear();
+	sha1.Reset();
+	sha1.Update((UINT_8 *)rawBinary, rawBinaryLength);
+	sha1.Final();
+	sha1.GetHash((UINT_8 *)SHA1_Key);
 
-    /* If URL itself contains ?key=value, then extract and put them in map */
-    size_t nPos = rawUrl.find_first_of( "?" );
-    if( std::string::npos != nPos )
-    {
-        /* Get only URL */
-        pureUrl = rawUrl.substr( 0, nPos );
-
-        /* Get only key=value data part */
-        std::string dataPart = rawUrl.substr( nPos + 1 );
-        rawKeyValuePairs = ParseKeyValuePairs(dataPart);
-    }
-
-    // NOTE: We always request URL encoding on the first pass so that the
-    // signature generation works properly. This *relies* on
-    // buildOAuthTokenKeyValuePairs overwriting values when we do the second
-    // pass to get the values in the form we actually want. The signature and
-    // rawdata are the only things that change, but the signature is only used
-    // in the second pass and the rawdata is already encoded, regardless of
-    // request type.
-
-    /* Build key-value pairs needed for OAuth request token, without signature */
-    buildOAuthTokenKeyValuePairs( includeOAuthVerifierPin, rawData, std::string( "" ), rawKeyValuePairs, true, true );
-
-    /* Get url encoded base64 signature using request type, url and parameters */
-    getSignature( eType, pureUrl, rawKeyValuePairs, oauthSignature );
-
-    /* Now, again build key-value pairs with signature this time */
-    buildOAuthTokenKeyValuePairs( includeOAuthVerifierPin, std::string( "" ), oauthSignature, rawKeyValuePairs, do_urlencode, false );
-
-    /* Get OAuth header in string format. If we're getting the Authorization
-     * header, we need to filter out other parameters.
-     */
-    if (string_type == AuthorizationHeaderString) {
-        KeyValuePairs oauthKeyValuePairs;
-        std::vector<std::string> oauth_keys;
-        oauth_keys.push_back(Defaults::CONSUMERKEY_KEY);
-        oauth_keys.push_back(Defaults::NONCE_KEY);
-        oauth_keys.push_back(Defaults::SIGNATURE_KEY);
-        oauth_keys.push_back(Defaults::SIGNATUREMETHOD_KEY);
-        oauth_keys.push_back(Defaults::TIMESTAMP_KEY);
-        oauth_keys.push_back(Defaults::TOKEN_KEY);
-        oauth_keys.push_back(Defaults::VERIFIER_KEY);
-        oauth_keys.push_back(Defaults::VERSION_KEY);
-
-        for(size_t i = 0; i < oauth_keys.size(); i++) {
-            assert(rawKeyValuePairs.count(oauth_keys[i]) <= 1);
-            KeyValuePairs::iterator oauth_key_it = rawKeyValuePairs.find(oauth_keys[i]);
-            if (oauth_key_it != rawKeyValuePairs.end())
-                ReplaceOrInsertKeyValuePair(oauthKeyValuePairs, oauth_keys[i], oauth_key_it->second);
-        }
-        getStringFromOAuthKeyValuePairs( oauthKeyValuePairs, rawParams, separator );
-    }
-    else if (string_type == QueryStringString) {
-        getStringFromOAuthKeyValuePairs( rawKeyValuePairs, rawParams, separator );
-    }
-
-    /* Build authorization header */
-    return rawParams;
+	bodyHash = PercentEncode(base64_encode(SHA1_Key, 20));
 }
+
+std::string Client::buildOAuthParameterString(
+	ParameterStringType string_type,
+	const Http::RequestType eType,
+	const std::string& rawUrl,
+	const std::string& rawData,
+	const bool includeOAuthVerifierPin)
+{
+	KeyValuePairs rawKeyValuePairs;
+	std::string rawParams;
+	std::string oauthSignature;
+	std::string paramsSeperator;
+	std::string pureUrl(rawUrl);
+
+	LOG(LogLevelDebug, "Signing request " << RequestTypeString(eType) << " " << rawUrl << " " << rawData);
+
+	std::string separator;
+	bool do_urlencode;
+	if (string_type == AuthorizationHeaderString) {
+		separator = ",";
+		do_urlencode = false;
+	}
+	else { // QueryStringString
+		separator = "&";
+		do_urlencode = true;
+	}
+
+	/* Clear header string initially */
+	rawKeyValuePairs.clear();
+
+	/* If URL itself contains ?key=value, then extract and put them in map */
+	size_t nPos = rawUrl.find_first_of("?");
+	if (std::string::npos != nPos)
+	{
+		/* Get only URL */
+		pureUrl = rawUrl.substr(0, nPos);
+
+		/* Get only key=value data part */
+		std::string dataPart = rawUrl.substr(nPos + 1);
+		rawKeyValuePairs = ParseKeyValuePairs(dataPart);
+	}
+
+	// NOTE: We always request URL encoding on the first pass so that the
+	// signature generation works properly. This *relies* on
+	// buildOAuthTokenKeyValuePairs overwriting values when we do the second
+	// pass to get the values in the form we actually want. The signature and
+	// rawdata are the only things that change, but the signature is only used
+	// in the second pass and the rawdata is already encoded, regardless of
+	// request type.
+
+	/* Build key-value pairs needed for OAuth request token, without signature */
+	buildOAuthTokenKeyValuePairs(includeOAuthVerifierPin, rawData, std::string(""), rawKeyValuePairs, true, true, std::string(""));
+
+	/* Get url encoded base64 signature using request type, url and parameters */
+	getSignature(eType, pureUrl, rawKeyValuePairs, oauthSignature);
+
+	/* Now, again build key-value pairs with signature this time */
+	buildOAuthTokenKeyValuePairs(includeOAuthVerifierPin, std::string(""), oauthSignature, rawKeyValuePairs, do_urlencode, false, std::string(""));
+
+	/* Get OAuth header in string format. If we're getting the Authorization
+	* header, we need to filter out other parameters.
+	*/
+	if (string_type == AuthorizationHeaderString) {
+		KeyValuePairs oauthKeyValuePairs;
+		std::vector<std::string> oauth_keys;
+		oauth_keys.push_back(Defaults::BODYHASH_KEY);
+		oauth_keys.push_back(Defaults::CONSUMERKEY_KEY);
+		oauth_keys.push_back(Defaults::NONCE_KEY);
+		oauth_keys.push_back(Defaults::SIGNATURE_KEY);
+		oauth_keys.push_back(Defaults::SIGNATUREMETHOD_KEY);
+		oauth_keys.push_back(Defaults::TIMESTAMP_KEY);
+		oauth_keys.push_back(Defaults::TOKEN_KEY);
+		oauth_keys.push_back(Defaults::VERIFIER_KEY);
+		oauth_keys.push_back(Defaults::VERSION_KEY);
+
+		for (size_t i = 0; i < oauth_keys.size(); i++) {
+			assert(rawKeyValuePairs.count(oauth_keys[i]) <= 1);
+			KeyValuePairs::iterator oauth_key_it = rawKeyValuePairs.find(oauth_keys[i]);
+			if (oauth_key_it != rawKeyValuePairs.end())
+				ReplaceOrInsertKeyValuePair(oauthKeyValuePairs, oauth_keys[i], oauth_key_it->second);
+		}
+		getStringFromOAuthKeyValuePairs(oauthKeyValuePairs, rawParams, separator);
+	}
+	else if (string_type == QueryStringString) {
+		getStringFromOAuthKeyValuePairs(rawKeyValuePairs, rawParams, separator);
+	}
+
+	/* Build authorization header */
+	return rawParams;
+}
+
 
 /*++
 * @method: Client::getStringFromOAuthKeyValuePairs
